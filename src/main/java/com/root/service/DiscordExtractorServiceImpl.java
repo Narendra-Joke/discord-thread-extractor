@@ -40,45 +40,45 @@ public class DiscordExtractorServiceImpl implements DiscordExtractorService {
     @Async
     @Transactional
     public String extractThreadMessages(ExtractRequest request) {
-        // ✅ PRIORITY 1: Thread ID (direct extraction)
+        // PRIORITY 1: Thread ID (direct extraction)
         if (request.getThreadId() != null && !request.getThreadId().isBlank()) {
             return extractFromThread(request.getThreadId(), request.getLimit());
         }
 
-        // ✅ PRIORITY 2: Channel ID (extract ALL threads)
+        // PRIORITY 2: Channel ID (extract ALL threads)
         if (request.getChannelId() != null && !request.getChannelId().isBlank()) {
             return extractFromChannel(request.getChannelId(), request.getLimit());
         }
 
-        return "❌ Provide either threadId OR channelId";
+        return "Provide either threadId OR channelId";
     }
 
     private String extractFromThread(String threadId, int limit) {
         // Existing thread logic...
         Guild guild = jda.getGuildById(defaultGuildId);
         ThreadChannel thread = guild.getThreadChannelById(threadId);
-        if (thread == null) return "❌ Thread not found: " + threadId;
+        if (thread == null) return "Thread not found: " + threadId;
 
         thread.getIterableHistory().limit(limit)
                 .forEachAsync(this::saveMessage);
-        return "🚀 Thread extraction started: " + threadId;
+        return "Thread extraction started: " + threadId;
     }
 
 //    private String extractFromChannel(String channelId, int limit) {
 //        Guild guild = jda.getGuildById(defaultGuildId);
 //        var channel = guild.getTextChannelById(channelId);  // Parent channel
-//        if (channel == null) return "❌ Channel not found: " + channelId;
+//        if (channel == null) return "Channel not found: " + channelId;
 //
-//        // ✅ FETCH ALL ACTIVE THREADS FROM CHANNEL
-//        // ✅ CORRECT - No extra parameter needed
+//        // FETCH ALL ACTIVE THREADS FROM CHANNEL
+//        // CORRECT - No extra parameter needed
 //        channel.getThreadChannels().forEach(thread -> {
-//            log.info("📋 Extracting thread: {} ({})", thread.getName(), thread.getId());
+//            log.info("Extracting thread: {} ({})", thread.getName(), thread.getId());
 //            thread.getIterableHistory().limit(limit)
-//                    .forEachAsync(this::saveMessage);  // ✅ Only Message parameter
+//                    .forEachAsync(this::saveMessage);  // Only Message parameter
 //        });
 //
 //
-//        return "🚀 Channel extraction started: " + channelId + " (" +
+//        return "Channel extraction started: " + channelId + " (" +
 //                channel.getThreadChannels().size() + " threads)";
 //    }
 
@@ -86,15 +86,15 @@ public class DiscordExtractorServiceImpl implements DiscordExtractorService {
         Guild guild = jda.getGuildById(defaultGuildId);
         TextChannel channel = guild.getTextChannelById(channelId);
         if (channel == null)
-            return "❌ Channel not found: " + channelId;
+            return "Channel not found: " + channelId;
 
-        log.info("🚀 Extracting ALL from channel: {} ({})", channel.getName(), channelId);
+        log.info("Extracting ALL from channel: {} ({})", channel.getName(), channelId);
 
-        // ✅ 1. Extract ALL MESSAGES FROM PARENT CHANNEL
+        // 1. Extract ALL MESSAGES FROM PARENT CHANNEL
         channel.getIterableHistory().limit(limit)
                 .forEachAsync(this::saveMessage);
 
-        // ✅ 2. Extract ALL MESSAGES FROM ALL THREADS
+        // 2. Extract ALL MESSAGES FROM ALL THREADS
         channel.getThreadChannels().forEach(thread -> {
             log.info("📋 Thread: {} ({})", thread.getName(), thread.getId());
             thread.getIterableHistory().limit(limit)
@@ -102,7 +102,7 @@ public class DiscordExtractorServiceImpl implements DiscordExtractorService {
         });
 
         int totalThreads = channel.getThreadChannels().size();
-        return String.format("🚀 Channel extraction COMPLETE: %s (%d threads, %d msg limit)",
+        return String.format("Channel extraction COMPLETE: %s (%d threads, %d msg limit)",
                 channel.getName(), totalThreads, limit);
     }
 
@@ -111,7 +111,7 @@ public class DiscordExtractorServiceImpl implements DiscordExtractorService {
             DiscordMessage entity = new DiscordMessage();
             entity.setMessageId(message.getId());
 
-            // ✅ Use ACTUAL channel/thread ID from message
+            // Use ACTUAL channel/thread ID from message
             entity.setThreadId(message.getChannel().getId());  // ThreadChannel ID
             entity.setChannelId(message.getChannel().getId()); // Same as thread ID
             entity.setGuildId(message.getGuild().getId());
@@ -124,7 +124,7 @@ public class DiscordExtractorServiceImpl implements DiscordExtractorService {
             repository.saveAndFlush(entity);  // Flush for high volume
             return true;  // Continue pagination
         } catch (Exception e) {
-            log.error("💾 Save failed for message {}: {}", message.getId(), e.getMessage());
+            log.error("Save failed for message {}: {}", message.getId(), e.getMessage());
             return true;  // Continue even on error
         }
     }

@@ -20,16 +20,16 @@ public class JdaConfig {
     public JDA jda() throws Exception {
         JDA jda = JDABuilder.createLight(token)
                 .enableIntents(
-                        GatewayIntent.GUILD_MESSAGES,           // ✅ Channel access
-                        GatewayIntent.MESSAGE_CONTENT,         // ✅ Message content (privileged)
-                        GatewayIntent.GUILD_MESSAGE_REACTIONS  // ✅ Reactions if needed
+                        GatewayIntent.GUILD_MESSAGES,           // Channel access
+                        GatewayIntent.MESSAGE_CONTENT,         // Message content (privileged)
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS  // Reactions if needed
                         // NO GUILD_MESSAGE_THREADS - doesn't exist!
                 )
                 .setActivity(Activity.watching("Thread Extraction"))
                 .build()
                 .awaitReady();
 
-        log.info("✅ JDA Ready: {}", jda.getSelfUser().getName());
+        log.info("JDA Ready: {}", jda.getSelfUser().getName());
         return jda;
     }
 }
