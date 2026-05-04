@@ -85,7 +85,8 @@ public class DiscordExtractorServiceImpl implements DiscordExtractorService {
     private String extractFromChannel(String channelId, int limit) {
         Guild guild = jda.getGuildById(defaultGuildId);
         TextChannel channel = guild.getTextChannelById(channelId);
-        if (channel == null) return "❌ Channel not found: " + channelId;
+        if (channel == null)
+            return "❌ Channel not found: " + channelId;
 
         log.info("🚀 Extracting ALL from channel: {} ({})", channel.getName(), channelId);
 
